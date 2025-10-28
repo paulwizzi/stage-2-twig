@@ -1,0 +1,84 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+  <div>
+    <div class="dash-header">
+      <h2>Tickets</h2>
+      <div>
+        <a class="btn" href="#" onclick="document.getElementById('ticket-form').style.display='block';return false;">New Ticket</a>
+      </div>
+    </div>
+
+    <div id="ticket-form" class="card form-card" style="display: {{ form is defined ? 'block' : 'none' }}">
+      <h3>{{ form and form.id ? 'Edit Ticket' : 'New Ticket' }}</h3>
+      <form method="post" action="/tickets">
+        <input type="hidden" name="id" value="{{ form.id|default('') }}" />
+
+        <label for="ticket-title">Title
+          <input id="ticket-title" name="title" value="{{ form.title|default('') }}" aria-invalid="{{ errors.title is defined ? 'true' : 'false' }}" />
+          {% if errors.title is defined %}<div class="inline-error" role="alert">{{ errors.title }}</div>{% endif %}
+        </label>
+
+        <label for="ticket-status">Status
+          <select id="ticket-status" name="status" aria-invalid="{{ errors.status is defined ? 'true' : 'false' }}">
+            {% set allowedStatus = ['open','in_progress','closed'] %}
+            {% for s in allowedStatus %}
+              <option value="{{ s }}" {{ form.status|default('open') == s ? 'selected' : '' }}>{{ s }}</option>
+            {% endfor %}
+          </select>
+          {% if errors.status is defined %}<div class="inline-error" role="alert">{{ errors.status }}</div>{% endif %}
+        </label>
+
+        <label for="ticket-description">Description
+          <textarea id="ticket-description" name="description" aria-invalid="{{ errors.description is defined ? 'true' : 'false' }}">{{ form.description|default('') }}</textarea>
+          {% if errors.description is defined %}<div class="inline-error" role="alert">{{ errors.description }}</div>{% endif %}
+        </label>
+
+        <div class="form-actions">
+          <button type="submit" class="btn">{{ form and form.id ? 'Save' : 'Create' }}</button>
+          <a class="btn ghost" href="/tickets">Cancel</a>
+        </div>
+      </form>
+    </div>
+
+    <div class="grid cols-3">
+      {% if tickets|length == 0 %}
+        <div class="card">No tickets yet.</div>
+      {% endif %}
+      {% for t in tickets %}
+        <div class="card ticket-card">
+          <div class="ticket-top">
+            <h3>{{ t.title }}</h3>
+            {% set tagClass = t.status == 'open' ? 'tag green' : (t.status == 'in_progress' ? 'tag amber' : 'tag gray') %}
+            <span class="{{ tagClass }}">{{ t.status|replace({'_':' '}) }}</span>
+          </div>
+          <p class="muted">{{ t.description }}</p>
+          <div class="card-actions">
+            <a class="btn small" href="/tickets?edit={{ t.id }}" onclick="event.preventDefault();openEdit({{ t.id }});">Edit</a>
+            <form method="post" action="/tickets/delete" style="display:inline" onsubmit="return confirm('Delete this ticket?');">
+              <input type="hidden" name="id" value="{{ t.id }}" />
+              <button class="btn small ghost" type="submit">Delete</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <script>
+      function openEdit(id){
+        const form = document.getElementById('ticket-form');
+        form.style.display = 'block';
+        const item = {{ tickets|json_encode|raw }}.find(t => t.id === id);
+        if(!item) return;
+        form.querySelector('input[name="id"]').value = item.id;
+        form.querySelector('input[name="title"]').value = item.title;
+        form.querySelector('select[name="status"]').value = item.status;
+        form.querySelector('textarea[name="description"]').value = item.description || '';
+        form.querySelector('button[type="submit"]').textContent = 'Save';
+        form.querySelector('h3').textContent = 'Edit Ticket';
+      }
+    </script>
+  </div>
+{% endblock %}
+
+

@@ -1,0 +1,20 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+  <div class="auth-card">
+    <h2>Create account</h2>
+    <form method="post" action="/auth/signup">
+      <label for="signup-email">Email
+        <input id="signup-email" name="email" type="email" required />
+      </label>
+      <label for="signup-password">Password
+        <input id="signup-password" name="password" type="password" required minlength="8" />
+      </label>
+      {% if error %}<div class="inline-error" role="alert">{{ error }}</div>{% endif %}
+      <button type="submit" class="btn">Sign up</button>
+    </form>
+    <p>Already have an account? <a href="/auth/login">Login</a></p>
+  </div>
+{% endblock %}
+
+

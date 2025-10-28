@@ -1,0 +1,25 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+  <div>
+    <div class="dash-header">
+      <div>
+        <h2>Dashboard</h2>
+        {% if user %}<p class="muted" style="margin:0;margin-top:4px">Welcome, {{ user.email }}</p>{% endif %}
+      </div>
+      <div>
+        <a class="btn" href="/tickets">Manage Tickets</a>
+        <form method="post" action="/auth/logout" style="display:inline"><button class="btn ghost" type="submit">Logout</button></form>
+      </div>
+    </div>
+
+    <div class="card-row">
+      <div class="card"> <h3>Total</h3> <div class="stat">{{ stats.total }}</div></div>
+      <div class="card"> <h3>Open</h3> <div class="stat green">{{ stats.open }}</div></div>
+      <div class="card"> <h3>In Progress</h3> <div class="stat" style="color:var(--amber)">{{ stats.inProgress }}</div></div>
+      <div class="card"> <h3>Closed</h3> <div class="stat gray">{{ stats.closed }}</div></div>
+    </div>
+  </div>
+{% endblock %}
+
+

@@ -1,0 +1,37 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+  <div class="card">
+    <h3>Import from localStorage</h3>
+    <p>This will copy users, tickets, and your current session from the browser&apos;s localStorage into the server.</p>
+    <div class="form-actions">
+      <button class="btn" onclick="importNow()">Import now</button>
+      <a class="btn ghost" href="/">Cancel</a>
+    </div>
+    <div id="result" style="margin-top:12px" class="muted"></div>
+  </div>
+
+  <script>
+    function read(key){
+      try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; }
+    }
+    async function importNow(){
+      const payload = {
+        users: read('ticketapp_users_v1') || [],
+        tickets: (read('ticketapp_tickets_v1') || []),
+        session: read('ticketapp_session') || null,
+      };
+      const res = await fetch('/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const out = await res.json().catch(()=>({ success:false, error:'Bad response' }));
+      const el = document.getElementById('result');
+      if(out.success){
+        el.textContent = 'Imported successfully. Redirecting…';
+        setTimeout(()=>{ window.location.href = '/dashboard'; }, 800);
+      } else {
+        el.textContent = 'Import failed: ' + (out.error || 'Unknown error');
+      }
+    }
+  </script>
+{% endblock %}
+
+

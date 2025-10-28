@@ -1,0 +1,20 @@
+<header class="site-header">
+  <div class="container-inner">
+    <div class="brand"><a href="/">PaulTicket</a></div>
+    <nav class="nav">
+      <a href="/">Home</a>
+      {% if user %}
+        <a href="/dashboard">Dashboard</a>
+        <a href="/tickets">Tickets</a>
+        <form method="post" action="/auth/logout" style="display:inline">
+          <button class="btn ghost small" type="submit">Logout</button>
+        </form>
+      {% else %}
+        <a href="/auth/login">Login</a>
+        <a href="/auth/signup">Get Started</a>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+
+
